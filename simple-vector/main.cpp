@@ -4,6 +4,7 @@
 #include <iostream>
 #include <numeric>
 #include <utility>
+#include "array_ptr.h"
 
 using namespace std;
 
@@ -48,6 +49,22 @@ SimpleVector<int> GenerateVector(size_t size)
     return vec;
 }
 
+// Инициализация вектора при помощи std::initializer_list
+void TestInitializerListConstructor()
+{
+    cout << "Test std::initializer_list сonstructor" << endl;
+
+    SimpleVector<int> vec { 1, 2, 3 };
+    assert(vec.GetSize() == 3);
+    assert(vec.GetCapacity() == 3);
+    assert(vec[2] == 3);
+
+    SimpleVector<int> vec2 = vec;
+    assert(vec2 == vec);
+
+    cout << "Done!" << endl << endl;
+}
+
 void TestTemporaryObjConstructor() 
 {
     const size_t size = 1000000;
@@ -60,13 +77,30 @@ void TestTemporaryObjConstructor()
 
 void TestTemporaryObjOperator() 
 {
-    const size_t size = 1000000;
+    const size_t size = 10;
     cout << "Test with temporary object, operator=" << endl;
 
     SimpleVector<int> moved_vector;
+    SimpleVector<int> gen_vector;
     assert(moved_vector.GetSize() == 0);
-    moved_vector = GenerateVector(size);
+    gen_vector = GenerateVector(size);
+
+    cout << "gen_vector = { ";
+    for (auto m : gen_vector)
+    {
+        cout << m << " ";
+    }
+    cout << "}, size = " << gen_vector.GetSize() << endl;
+
+    moved_vector = gen_vector;
     assert(moved_vector.GetSize() == size);
+
+    cout << "moved_vector = { ";
+    for (auto m : moved_vector)
+    {
+        cout << m << " ";
+    }
+    cout << "}, size = " << moved_vector.GetSize() << endl;
 
     cout << "Done!" << endl << endl;
 }
@@ -158,12 +192,10 @@ void TestNoncopiableInsert()
     }
 
     cout << "vec { ";
-
     for (size_t i = 0; i < vec.GetSize(); ++i) 
     {
         cout << vec[i].GetX() << " ";
     }
-    
     cout << "}";
     cout << ", size = " << vec.GetSize() << ", capacity = " << vec.GetCapacity() << endl;
 
@@ -183,12 +215,10 @@ void TestNoncopiableInsert()
     assert((vec.begin() + 3)->GetX() == size + 3);
 
     cout << "vec { ";
-
     for (size_t i = 0; i < vec.GetSize(); ++i) 
     {
         cout << vec[i].GetX() << " ";
     }
-    
     cout << "}";
     cout << ", size = " << vec.GetSize() << ", capacity = " << vec.GetCapacity() << endl;
 
@@ -208,12 +238,10 @@ void TestNoncopiableErase()
     }
 
     cout << "vec { ";
-
     for (size_t i = 0; i < vec.GetSize(); ++i) 
     {
         cout << vec[i].GetX() << " ";
     }
-    
     cout << "}";
     cout << ", size = " << vec.GetSize() << endl;
 
@@ -221,12 +249,10 @@ void TestNoncopiableErase()
     assert(it->GetX() == 1);
 
     cout << "vec { ";
-
     for (size_t i = 0; i < vec.GetSize(); ++i) 
     {
         cout << vec[i].GetX() << " ";
     }
-    
     cout << "}";
     cout << ", size = " << vec.GetSize() << endl;
 
@@ -275,16 +301,16 @@ void TestNoncopiableReserve()
         vec.PushBack(X(i));
     }
 
-    size_t old_capacity = vec.GetCapacity();
+    size_t org_capacity = vec.GetCapacity();
     cout << "Test noncopiable reserve" << endl;
     cout << "vec size = " << vec.GetSize() << ", capacity = " << vec.GetCapacity() << endl;
 
     // new capacity > capacity
     vec.Reserve(20);
     assert(vec.GetCapacity() == 20);
-    cout << "reserved size " << vec.GetCapacity() << " > capacity " << old_capacity << ", new capacity = " << vec.GetCapacity() << endl;
+    cout << "reserved size " << vec.GetCapacity() << " > capacity " << org_capacity << ", new capacity = " << vec.GetCapacity() << endl;
 
-    // new capacity >= capacity
+    // new capacity <= capacity
     size_t capacity = vec.GetCapacity();
     vec.Reserve(10);
     assert(vec.GetCapacity() == capacity);
@@ -305,36 +331,35 @@ void TestPopBack()
 
     cout << "Test noncopiable pop back" << endl;
     cout << "vec { ";
-
     for (size_t i = 0; i < vec.GetSize(); ++i) 
     {
         cout << vec[i].GetX() << " ";
     }
-    
     cout << "}";
     cout << ", size = " << vec.GetSize() << endl;
 
     size_t org_size = vec.GetSize();
     vec.PopBack();
-
     assert(vec.GetSize() == (org_size - 1));
+
     cout << "vec size after pop back" << endl;
     cout << "vec { ";
-
     for (size_t i = 0; i < vec.GetSize(); ++i) 
     {
         cout << vec[i].GetX() << " ";
     }
-    
     cout << "}";
     cout << ", size = " << vec.GetSize() << endl;
+
     auto it = vec.cend();
     assert(it->GetX() == 9);
+    
     cout << "Done!" << endl;   
 }
 
 int main()
 {
+    TestInitializerListConstructor();
     TestTemporaryObjConstructor();
     TestTemporaryObjOperator();
     TestNamedMoveConstructor();
