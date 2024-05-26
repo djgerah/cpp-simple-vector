@@ -18,8 +18,15 @@ public:
     explicit ArrayPtr(size_t size) 
     {
         // Реализуйте конструктор самостоятельно
-        if (size == 0) { raw_ptr_ = nullptr; }
-        else { raw_ptr_ = new Type[size]; }
+        if (size == 0) 
+        { 
+            raw_ptr_ = nullptr; 
+        }
+        
+        else 
+        { 
+            raw_ptr_ = new Type[size]; 
+        }
     }
 
     // Конструктор из сырого указателя, хранящего адрес массива в куче либо nullptr
@@ -28,17 +35,32 @@ public:
         : raw_ptr_(raw_ptr)
         {}
 
-    // Запрещаем копирование
+     // Запрещаем копирование
     ArrayPtr(const ArrayPtr&) = delete;
+
+    explicit ArrayPtr(ArrayPtr&& other) noexcept
+    {   
+        raw_ptr_ = std::move(other.raw_ptr_);
+        other.raw_ptr_ = nullptr;
+    }
+
+    // Запрещаем присваивание
+    ArrayPtr& operator=(const ArrayPtr&) = delete;
+
+    ArrayPtr& operator=(ArrayPtr&& other)
+    {
+        if (this != &other)
+        {
+            raw_ptr_ = std::move(other.raw_ptr_);
+        }
+        return *this;
+    }
 
     ~ArrayPtr() 
     {
         // Напишите деструктор самостоятельно
         delete[] raw_ptr_;
     }
-
-    // Запрещаем присваивание
-    ArrayPtr& operator=(const ArrayPtr&) = delete;
 
     // Прекращает владением массивом в памяти, возвращает значение адреса массива
     // После вызова метода указатель на массив должен обнулиться
