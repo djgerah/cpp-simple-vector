@@ -273,38 +273,38 @@ public:
     // вместимость вектора должна увеличиться вдвое, а для вектора вместимостью 0 стать равной 1
 	Iterator Insert(ConstIterator pos, const Type& value) 
     {
-		assert(pos >= begin() && pos <= end());
+	assert(pos >= begin() && pos <= end());
         size_t index = std::distance(cbegin(), pos);
 
         // Перелокация памяти не нужна
-		if (capacity_ > size_) 
+	if (capacity_ > size_) 
         {
             // Копируем элементы после заданной позиции в обратном порядке на одно место вправо. 
             // На обрзовавшееся место вставляем value
             std::copy_backward(const_cast<Iterator>(pos), end(), (end() + 1));
-			items_[index] = value;
-		}
+	    items_[index] = value;
+	}
 
         // Перелокация памяти нужна
-		else 
+	else 
         {
-			size_t new_capacity = capacity_ == 0 ? 1 : capacity_ * 2;
+	    size_t new_capacity = capacity_ == 0 ? 1 : capacity_ * 2;
             Reserve(new_capacity, index, pos, value);
             /*
             // Создаем новый массив повыщенной вместимости 
-	        ArrayPtr<Type> temp(new_capacity); 
+	    ArrayPtr<Type> temp(new_capacity); 
             // Копируем все элементы до заданной позиции, 
-	        std::copy(begin(), const_cast<Iterator>(pos), temp.Get()); 
+  	    std::copy(begin(), const_cast<Iterator>(pos), temp.Get()); 
             // вставляем value, 
-	        temp[index] = value; 
+	    temp[index] = value; 
             // копируем все элементы после позиции. 
-	        std::copy(const_cast<Iterator>(pos), end(), (temp.Get() + index + 1)); 
+	    std::copy(const_cast<Iterator>(pos), end(), (temp.Get() + index + 1)); 
              
-	        items_.swap(temp); 
+	    items_.swap(temp); 
             // Обновляем вместимость вектора,
             capacity_ = new_capacity; 
             */
-		}
+	}
         // обновляем размер вектора
         ++size_;
         // return (SimpleVector::Iterator)pos;
@@ -318,24 +318,24 @@ public:
     // вместимость вектора должна увеличиться вдвое, а для вектора вместимостью 0 стать равной 1
 	Iterator Insert(ConstIterator pos, Type&& value)
     {
-		assert(pos >= begin() && pos <= end());
+	assert(pos >= begin() && pos <= end());
         size_t index = std::distance(cbegin(), pos);
 
         // Перелокация памяти не нужна
-		if (capacity_ > size_) 
+	if (capacity_ > size_) 
         {
             // Перемещаем элементы после заданной позиции в обратном порядке на одно место вправо. 
             // На обрзовавшееся место перемещаем value
             std::move_backward(const_cast<Iterator>(pos), end(), (end() + 1));
-			items_[index] = std::move(value);
-		}
+	    items_[index] = std::move(value);
+	}
 
         // Перелокация памяти нужна
-		else 
+	else 
         {
-			size_t new_capacity = capacity_ == 0 ? 1 : capacity_ * 2;
+	    size_t new_capacity = capacity_ == 0 ? 1 : capacity_ * 2;
             Reserve(new_capacity, index, pos, value);
-		}
+	}
         // обновляем размер вектора
         ++size_;
         // return &items_[index];
